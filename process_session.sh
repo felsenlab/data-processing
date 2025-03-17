@@ -10,7 +10,7 @@ fi
 home_folder=$1
 
 # Initialize conda
-source ~/anaconda3/etc/profile.d/conda.sh
+source /home/polegpolskylab/anaconda3/etc/profile.d/conda.sh
 
 #
 cd /home/polegpolskylab/Code/data-processing
