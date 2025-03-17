@@ -9,6 +9,9 @@ fi
 # Store the first positional argument
 home_folder=$1
 
+# Initialize conda
+source ~/anaconda3/etc/profile.d/conda.sh
+
 #
 cd /home/polegpolskylab/Code/data-processing
 
