@@ -18,6 +18,6 @@ python ./scripts/extract_pose.py home_folder
 conda deactivate
 
 # Extract real saccades
-conda actiate se
+conda activate se
 python ./scripts/extract_saccades.py home_folder
 conda deactivate
