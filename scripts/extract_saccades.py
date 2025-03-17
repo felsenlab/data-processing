@@ -1,5 +1,6 @@
 import argparse
 import pathlib as pl
+from data_extraction import PrintSuppressor
 try:
     import saccade_extraction as se
 except:
@@ -57,4 +58,5 @@ if __name__ == '__main__':
     namespace = parser.parse_args()
     fileSets = collectFileSets(namespace.home)
     config = locateSaccadeExtractionProject()
-    extractSaccades(config, fileSets)
+    with PrintSuppressor():
+        extractSaccades(config, fileSets)
