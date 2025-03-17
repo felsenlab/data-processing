@@ -3,10 +3,14 @@ import argparse
 import logging
 import contextlib
 import pathlib as pl
-try:
-    import deeplabcut as dlc
-except ImportError:
-    dlc = None
+with open(os.devnull, 'w') as f, contextlib.redirect_stdout(f), contextlib.redirect_stderr(f):
+    logging.disable(logging.CRITICAL)  # Disable logging
+    try:
+        import deeplabcut as dlc
+    except ImportError:
+        dlc = None
+    finally:
+        logging.disable(logging.NOTSET)  # Re-enable logging
 
 # TODO: Make this more intelligent/flexible
 def locateDeeplabcutProject(
@@ -39,6 +43,14 @@ def analyzeVideosQuietly(*args, **kwargs):
             return dlc.analyze_videos(*args, **kwargs_)
         finally:
             logging.disable(logging.NOTSET)  # Re-enable logging
+
+    # Delete h5 and pickle files
+    for video in kwargs_['videos']:
+        video = pl.Path(video)
+        parent = video.parent
+        for file in parent.iterdir():
+            if video.stem in file.name and (file.suffix == '.h5' or file.suffix == '.pickle'):
+                file.unlink()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
