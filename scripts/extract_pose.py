@@ -24,7 +24,7 @@ def collectVideos(
     if type(homeFolder) != pl.Path:
         homeFolder = pl.Path(homeFolder)
 
-    return list(homeFolder.rglob(f"{'[0-9]' * 8}*unit*session*.mp4"))
+    return [str(path) for path in homeFolder.rglob(f"{'[0-9]' * 8}*unit*session*.mp4")]
 
 def analyzeVideosQuietly(*args, **kwargs):
     """
