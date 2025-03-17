@@ -25,8 +25,8 @@ def collectFileSets(
     for poseEstimate in poseEstimates:
         fileSet = list()
         fileSet.append(poseEstimate)
-        stem = poseEstimate.name.split('DLC')[0]
-        result = list(homeFolder.rglob(f'{stem}*_timestamps.txt'))
+        stem = poseEstimate.name.split('DLC')[0].rstrip('-0000')
+        result = list(homeFolder.rglob(f'*{stem}*timestamps.txt'))
         if len(result) == 1:
             interframeIntervals = result.pop()
             fileSet.append(interframeIntervals)
