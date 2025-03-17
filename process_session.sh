@@ -17,10 +17,10 @@ cd /home/polegpolskylab/Code/data-processing
 
 # Extract pose estimates
 conda activate rtdlc
-python ./scripts/extract_pose.py home_folder
+python ./scripts/extract_pose.py "$home_folder"
 conda deactivate
 
 # Extract real saccades
 conda activate se
-python ./scripts/extract_saccades.py home_folder
+python ./scripts/extract_saccades.py "$home_folder"
 conda deactivate
