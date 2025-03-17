@@ -44,7 +44,7 @@ def extractSaccades(*args, **kwargs):
 
     kwargs_ = {}
     kwargs_.update(kwargs)
-    kwargs_['modelIndex'] = -2
+    kwargs_['modelIndex'] = -1
     se.extractRealSaccades(
         *args, **kwargs
     )
