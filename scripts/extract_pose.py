@@ -46,7 +46,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     videos = collectVideos(args.home)
     config = locateDeeplabcutProject()
-    dlc.anlayze_videos(
+    dlc.analyze_videos(
         config,
         videos=videos,
         save_as_csv=True
