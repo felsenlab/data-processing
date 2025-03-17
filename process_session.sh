@@ -9,12 +9,15 @@ fi
 # Store the first positional argument
 home_folder=$1
 
+#
+cd /home/polegpolskylab/Code/data-processing
+
 # Extract pose estimates
 conda activate rtdlc
-python -m extract_pose home_folder
+python ./scripts/extract_pose.py home_folder
 conda deactivate
 
 # Extract real saccades
 conda actiate se
-python -m extract_saccades home_folder
-conda deactiate
+python ./scripts/extract_saccades.py home_folder
+conda deactivate
