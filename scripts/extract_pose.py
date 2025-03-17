@@ -46,8 +46,13 @@ if __name__ == '__main__':
     args = parser.parse_args()
     videos = collectVideos(args.home)
     config = locateDeeplabcutProject()
-    analyzeVideosQuietly(
+    dlc.anlayze_videos(
         config,
         videos=videos,
         save_as_csv=True
     )
+    # analyzeVideosQuietly(
+    #     config,
+    #     videos=videos,
+    #     save_as_csv=True
+    # )
