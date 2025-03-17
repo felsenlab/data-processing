@@ -54,7 +54,7 @@ def extractSaccades(*args, **kwargs):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('home', type=str, help='Home folder for the session')
-    args = parser.parse_args()
-    fileSets = collectFileSets(args.home)
+    namespace = parser.parse_args()
+    fileSets = collectFileSets(namespace.home)
     config = locateSaccadeExtractionProject()
     extractSaccades(config, fileSets)
