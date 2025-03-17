@@ -24,7 +24,7 @@ def collectVideos(
     if type(homeFolder) != pl.Path:
         homeFolder = pl.Path(homeFolder)
 
-    return list(homeFolder.rglob("[0-9]" * 8 + "_unit*_session* *.mp4"))
+    return list(homeFolder.rglob(f"{'[0-9]' * 8}*unit*session*.mp4"))
 
 def analyzeVideosQuietly(*args, **kwargs):
     """
@@ -46,13 +46,13 @@ if __name__ == '__main__':
     args = parser.parse_args()
     videos = collectVideos(args.home)
     config = locateDeeplabcutProject()
-    dlc.analyze_videos(
-        config,
-        videos=videos,
-        save_as_csv=True
-    )
-    # analyzeVideosQuietly(
+    # dlc.analyze_videos(
     #     config,
     #     videos=videos,
     #     save_as_csv=True
     # )
+    analyzeVideosQuietly(
+        config,
+        videos=videos,
+        save_as_csv=True
+    )
