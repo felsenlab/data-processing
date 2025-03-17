@@ -14,7 +14,7 @@ def locateDeeplabcutProject(
     """
     """
 
-    return '/home/polegpolskylab/Documents/DeepLabCut/sacnet/sacnet-josh-2025-01-29'
+    return '/home/polegpolskylab/Documents/DeepLabCut/sacnet/sacnet-josh-2025-01-29/config.yaml'
 
 def collectVideos(
     homeFolder,
