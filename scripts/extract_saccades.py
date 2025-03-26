@@ -11,7 +11,7 @@ def locateSaccadeExtractionProject():
     """
     """
 
-    return '/home/polegpolskylab/Documents/saccade-extraction-projects/sacnet2/config.yaml'
+    return '/home/schollab-dion/Projets/sacnet3/config.yaml'
 
 def collectFileSets(
     homeFolder
