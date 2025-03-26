@@ -19,7 +19,7 @@ log() {
 }
 
 # Initialize conda
-source /home/$USER/anaconda3/etc/profile.d/conda.sh
+source /home/$USER/miniconda3/etc/profile.d/conda.sh
 conda init
 
 #
