@@ -27,7 +27,7 @@ cd /home/$USER/Code/data-processing
 
 # Extract pose estimates
 log "INFO" "Extracting pose estimates"
-conda activate rtdlc
+conda activate deeplabcut
 python ./scripts/extract_pose.py "$HOME_FOLDER"
 conda deactivate
 
