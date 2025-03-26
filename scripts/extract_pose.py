@@ -48,6 +48,16 @@ def analyzeVideosQuietly(*args, **kwargs):
 
     return
 
+def analyzeVideos(*args, **kwargs):
+    """
+    """
+
+    kwargs_ = {}
+    kwargs_.update(kwargs)
+    dlc.analyze_videos(*args, **kwargs)
+
+    return
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('home', type=str, help='Home folder for the session')
@@ -56,7 +66,7 @@ if __name__ == '__main__':
     # for video in videos:
     #     print(video)
     config = locateDeeplabcutProject()
-    analyzeVideosQuietly(
+    analyzeVideos(
         config,
         videos=videos,
         save_as_csv=True
