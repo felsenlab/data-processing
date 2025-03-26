@@ -3,7 +3,7 @@ import argparse
 import logging
 import contextlib
 import pathlib as pl
-from data_extraction import PrintSuppressor
+from data_processing import PrintSuppressor
 try:
     with PrintSuppressor():
         import deeplabcut as dlc

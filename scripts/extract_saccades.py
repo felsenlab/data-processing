@@ -1,6 +1,6 @@
 import argparse
 import pathlib as pl
-from data_extraction import PrintSuppressor
+from data_processing import PrintSuppressor
 try:
     import saccade_extraction as se
 except:
