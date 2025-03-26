@@ -7,31 +7,36 @@ if [ $# -lt 1 ]; then
 fi
 
 # Assign the home folder to a variable
-home_folder=$1
+HOME_FOLDER=$1
 
 # Define logging function
-log_file="${home_folder%/}/log.txt"
+LOG_FILE="${HOME_FOLDER%/}/log.txt"
 log() {
-    local level=$1
+    local LEVEL=$1
     shift
-    local message="[$(date '+%Y-%m-%d, %H:%M:%S')] $level: $*"
-    echo "$message" | tee -a "$log_file"
+    local MESSAGE="[$(date '+%Y-%m-%d, %H:%M:%S')] $LEVEL: $*"
+    echo "$MESSAGE" | tee -a "$LOG_FILE"
 }
 
 # Initialize conda
-source /home/polegpolskylab/anaconda3/etc/profile.d/conda.sh
+source /home/$USER/anaconda3/etc/profile.d/conda.sh
 
 #
-cd /home/polegpolskylab/Code/data-processing
+RETURN_DIRECTORY=$(pwd)
+cd /home/$USER/Code/data-processing
 
 # Extract pose estimates
 log "INFO" "Extracting pose estimates"
 conda activate rtdlc
-python ./scripts/extract_pose.py "$home_folder"
+python ./scripts/extract_pose.py "$HOME_FOLDER"
 conda deactivate
 
 # Extract real saccades
 log "INFO" "Extracting real saccades"
 conda activate se
-python ./scripts/extract_saccades.py "$home_folder"
+python ./scripts/extract_saccades.py "$HOME_FOLDER"
 conda deactivate
+
+#
+cd $RETURN_DIRECTORY
+exit 0

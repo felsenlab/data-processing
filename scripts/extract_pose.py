@@ -43,14 +43,18 @@ def analyzeVideosQuietly(*args, **kwargs):
         video = pl.Path(video)
         parent = video.parent
         for file in parent.iterdir():
-            if video.stem in file.name and (file.suffix == '.h5' or file.suffix == '.pickle'):
+            if 'DLC' in file.name and (file.suffix == '.h5' or file.suffix == '.pickle'):
                 file.unlink()
+
+    return
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('home', type=str, help='Home folder for the session')
     namespace = parser.parse_args()
     videos = collectVideos(namespace.home)
+    # for video in videos:
+    #     print(video)
     config = locateDeeplabcutProject()
     analyzeVideosQuietly(
         config,
