@@ -20,7 +20,6 @@ log() {
 
 # Initialize conda
 source /home/$USER/miniconda3/etc/profile.d/conda.sh
-conda init
 
 #
 RETURN_DIRECTORY=$(pwd)
