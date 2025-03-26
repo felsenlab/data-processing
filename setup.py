@@ -6,14 +6,14 @@ def read_requirements():
         return [line.strip() for line in f if line.strip() and not line.startswith("#")]
 
 setup(
-    name="saccade-extraction",  # Replace with your package name
+    name="data-processing",  # Replace with your package name
     version="0.1.0",  # Versioning: major.minor.patch
     author="Joshua B. Hunt",
     author_email="felsenlab@gmail.com",
     description="A Python package for extracting saccades from eye movement data",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/felsenlab/saccade-extraction",
+    url="https://github.com/felsenlab/tata-processing",
     packages=find_packages(exclude=("tests", "docs")),  # Auto-discovers packages in the repo
     install_requires=read_requirements(),  # Read dependencies from requirements.txt
 )
