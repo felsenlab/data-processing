@@ -61,18 +61,57 @@ def extractSaccades(*args, **kwargs):
 
     return
 
-def align_saccades_to_LJ(homeFolder, outfile, lj_combined_file):
+def compute_frame_timestamps_for_crystals_sessions(
+    home_folder,
+    side='right',
+    lag=-4.37
+    ):
+    """
+    """
+
+    timestamp_files = list(home_folder.joinpath('videos').rglob('_timestamps.txt'))
+    for f in timestamp_files:
+        if side in f.name:
+
+            # Load inter-frame intervals for the target camera
+            ifi = np.loadtxt(f)
+            frameTimestamps = np.concatenate([
+                np.array([0]),
+                np.cumsum(ifi[1:]) / 1000000000
+            ])
+
+            # Identify the first visual stimulus timestamp
+            t0 = None
+            for f in home_folder.joinpath('stimuli').iterdir():
+                if 'metadata' in f.name.lower() and f.stem.endswith('1'):
+                    with open(f, 'r') as stream:
+                        lines = stream.readlines()[5:]
+                    a, b, c, d, e = lines[0].rstrip('\n').split(',')
+                    t0 = float(e)
+            if t0 is None:
+                raise Exception('Could not identify the timestamp for the first visual event')
+            
+            # Add the timestamp of the first visual event + the constant lag
+            frameTimestamps = frameTimestamps + t0 + lag
+
+    return frameTimestamps
+
+def align_saccades_to_LJ(homeFolder, outfile, lj_combined_file, namespace):
     """
     Align saccades to the LabJack timestamps.
     This is done by finding the nearest frame timestamp to each saccade onset and offset.
     """
-    lj_data = np.load(lj_combined_file)
-    frame_signal = lj_data[:,7]
 
-    # Synchronization for frames
-    frame_edge_inds = np.where(np.diff(frame_signal) != 0)[0] + 1
-    frame_times = lj_data[frame_edge_inds,0]
-    # Convert to seconds since 
+    if namespace.is_crystal == 0:
+        lj_data = np.load(lj_combined_file)
+        frame_signal = lj_data[:,7]
+
+        # Synchronization for frames
+        frame_edge_inds = np.where(np.diff(frame_signal) != 0)[0] + 1
+        frame_times = lj_data[frame_edge_inds,0]
+        # Convert to seconds since 
+    else:
+        frame_times = compute_frame_timestamps_for_crystals_sessions(homeFolder)
 
     # Placing within outfile
     pose_group = outfile['pose/right']
@@ -111,7 +150,7 @@ def align_saccades_to_LJ(homeFolder, outfile, lj_combined_file):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('home', type=str, help='Home folder for the session')
-    #parser.add_argument('is_crystal', type=int, help='0 - file has LJ for timestamping. 1 - Crystals data, keep in frame clock')
+    parser.add_argument('is_crystal', type=int, help='0 - file has LJ for timestamping. 1 - Crystals data, keep in frame clock')
     namespace = parser.parse_args()
     fileSets = collectFileSets(namespace.home)
     config = locateSaccadeExtractionProject()
@@ -204,7 +243,7 @@ if __name__ == '__main__':
         #assert len(lj_file_maybe) > 0, "No secondary labjack file found, aborting."
         if len(lj_file_maybe) > 0:
             lj_combined_file = max(lj_file_maybe, key=os.path.getmtime)
-            align_saccades_to_LJ(namespace.home, outfile, lj_combined_file)
+            align_saccades_to_LJ(namespace.home, outfile, lj_combined_file, namespace)
         else:
             print('No LabJack file found for aligning saccades. Skipping alignment.')
 
