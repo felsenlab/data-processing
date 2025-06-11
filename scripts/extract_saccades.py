@@ -61,14 +61,52 @@ def extractSaccades(*args, **kwargs):
 
     return
 
-# def characterizeSaccades(outfile_h5, hz=200):
-#     ''' Basic characterization of saccades
-#     '''
-#     onset_inds = outfile_h5['saccades/onsets'][:].astype('int')
-#     offset_inds = outfile_h5['saccades/offsets'][:].astype('int')
-#     durs = (offset_inds) - onset_inds) * (1/hz)
+def align_saccades_to_LJ(homeFolder, outfile, lj_combined_file):
+    """
+    Align saccades to the LabJack timestamps.
+    This is done by finding the nearest frame timestamp to each saccade onset and offset.
+    """
+    lj_data = np.load(lj_combined_file)
+    frame_signal = lj_data[:,7]
+
+    # Synchronization for frames
+    frame_edge_inds = np.where(np.diff(frame_signal) != 0)[0] + 1
+    frame_times = lj_data[frame_edge_inds,0]
+    # Convert to seconds since 
+
+    # Placing within outfile
+    pose_group = outfile['pose/right']
+    dataset_name = 'frametimes_clock'
+    if dataset_name in pose_group:
+        print(f"Warning: Dataset '{dataset_name}' already exists. Overwriting...")
+        del pose_group[dataset_name]  # Delete existing dataset
+
+    # Create the new dataset in the pose_dlc group
+    pose_group.create_dataset(dataset_name, data=frame_times)
+
+    # Align saccades to nearest frame
+    if 'saccades' in outfile:
+        saccades_group = outfile['saccades/right'] if 'right' in outfile['saccades'] else outfile['saccades/left']
+        sacc_onsets = saccades_group['onsets'][:].astype('int')
+        sacc_offsets = saccades_group['offsets'][:].astype('int')
+
+        # sacc_onsets are the indices of the saccade onsets in the frame time.
+        # Align each frame index to the nearest frame time (found in frame_times)
+        frame_numbers = np.arange(len(frame_edge_inds))
+        sacc_onset_indices  = np.interp(sacc_onsets,  frame_numbers, frame_edge_inds).astype('int')
+        sacc_offset_indices = np.interp(sacc_offsets, frame_numbers, frame_edge_inds).astype('int')
+
+        sacc_onset_seconds = frame_times[sacc_onset_indices]
+        sacc_offset_seconds = frame_times[sacc_offset_indices]
+
+        # Sve the aligned saccade onsets and offsets
+        saccades_group.create_dataset('saccade_onsets_seconds',  data=sacc_onset_seconds)
+        saccades_group.create_dataset('saccade_offsets_seconds', data=sacc_offset_seconds)
     
-#     return vels, amps, durs, freq
+        outfile.flush()
+    else:
+        print('No saccades found in outfile to align to LabJack timestamps. Skipping alignment.')
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
@@ -115,6 +153,7 @@ if __name__ == '__main__':
             pose_group = outfile['pose/unknown'] if 'pose/unknown' in outfile else outfile.create_group('pose/unknown')
         pose_group.create_dataset('projections', data=processed)
         pose_group.create_dataset('timestamps', data=frameTimestamps)
+
         outfile.flush()
 
     # Check for previous saccade extraction results
@@ -158,6 +197,16 @@ if __name__ == '__main__':
         sacc_group.create_dataset('offsets', data = saccade_data['saccade_offset'][:])
         sacc_group.create_dataset('waveforms', data= saccade_data['saccade_waveforms'][:])
         outfile.flush()
+
+        # Align saccades to LabJack timestamps if LJ exists
+        lj_dir = os.path.join(namespace.home, 'labjack')
+        lj_file_maybe = glob(os.path.join(lj_dir, 'labjack_combined*.npy'))
+        #assert len(lj_file_maybe) > 0, "No secondary labjack file found, aborting."
+        if len(lj_file_maybe) > 0:
+            lj_combined_file = max(lj_file_maybe, key=os.path.getmtime)
+            align_saccades_to_LJ(namespace.home, outfile, lj_combined_file)
+        else:
+            print('No LabJack file found for aligning saccades. Skipping alignment.')
 
     # Answers are given without subframe precision (values calculated from nearest frame index)
     outfile.close()
