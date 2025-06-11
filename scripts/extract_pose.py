@@ -82,11 +82,11 @@ if __name__ == '__main__':
 
     # If we don't want to analyze videos, we can skip this step
     # Analyze videos
-    # analyzeVideos(
-    #     config,
-    #     videos=videos,
-    #     save_as_csv=True
-    # )
+    analyzeVideos(
+        config,
+        videos=videos,
+        save_as_csv=True
+    )
     # code.interact(local=dict(globals(), **locals())) 
 
     # Get the most recent results this way

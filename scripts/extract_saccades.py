@@ -69,9 +69,10 @@ def compute_frame_timestamps_for_crystals_sessions(
     """
     """
 
-    timestamp_files = list(home_folder.joinpath('videos').rglob('_timestamps.txt'))
+    timestamp_files = list(home_folder.joinpath('videos').rglob('*_timestamps.txt'))
+    frameTimestamps = None
     for f in timestamp_files:
-        if side in f.name:
+        if side in f.name.lower():
 
             # Load inter-frame intervals for the target camera
             ifi = np.loadtxt(f)
@@ -82,17 +83,21 @@ def compute_frame_timestamps_for_crystals_sessions(
 
             # Identify the first visual stimulus timestamp
             t0 = None
-            for f in home_folder.joinpath('stimuli').iterdir():
-                if 'metadata' in f.name.lower() and f.stem.endswith('1'):
+            for f in home_folder.joinpath('videos').iterdir():
+                if f.stem.lower() == 'driftinggratingmetadata':
                     with open(f, 'r') as stream:
                         lines = stream.readlines()[5:]
-                    a, b, c, d, e = lines[0].rstrip('\n').split(',')
+                    a, b, c, d, e = lines[0].rstrip('\n').split(', ')
                     t0 = float(e)
             if t0 is None:
-                raise Exception('Could not identify the timestamp for the first visual event')
+                raise Exception('Could not identify timestamp for the first visual event')
             
             # Add the timestamp of the first visual event + the constant lag
             frameTimestamps = frameTimestamps + t0 + lag
+
+    #
+    if frameTimestamps is None:
+        raise Exception('Could not compute frame timestamps')
 
     return frameTimestamps
 

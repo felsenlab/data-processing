@@ -19,15 +19,16 @@ log() {
 }
 
 # Initialize conda
-source /home/$USER/miniconda3/etc/profile.d/conda.sh
+source /home/schollab-dion/miniconda3/condabin/conda.sh
 
 #
 RETURN_DIRECTORY=$(pwd)
-#cd /home/$USER/Code/data-processing
-cd /home/schollab-dion/Documents/felsen_pipeline/data-processing
+cd /home/$USER/Code/data-processing
+# cd /home/schollab-dion/Documents/felsen_pipeline/data-processing
 
 # Initialize outfile for session
 log "INFO" "Initializing output .hdf5 file"
+
 conda activate genwork
 python ./scripts/init_outfile.py "$HOME_FOLDER"
 conda deactivate
