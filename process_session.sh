@@ -71,14 +71,6 @@ conda activate genwork
 python ./scripts/align_npx_to_LJ.py "$HOME_FOLDER"
 conda deactivate
 
-# # Timestamp frames and saccade onsets-offsets from eye camera
-# # 0 - data has labjack
-# # 1 - Crystal's data, keep things in frametimes
-# log "INFO" "Aligning pose frametimes and saccade onsets/offsets to nearest LJ time index"
-# conda activate genwork
-# python ./scripts/align_frames.py "$HOME_FOLDER" 1
-# conda deactivate
-
 # ## Not yet implemented
 # # # Timestamp stimulus information
 # # log "INFO" "Timestamping stimulus information"
