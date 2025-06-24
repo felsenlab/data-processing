@@ -43,8 +43,7 @@ Information related to putative and real saccade events.
 	- username : schollab-dion
 	- password : H&W,1962
 - Make sure that FelsenNAS is connected. Open 'Files' and check that 'the flnas' directory on the left side above 'Other Locations' opens to show the contents of the NAS. If the window is blank upon clicking this location, then the computer is not connected to the NAS over the network.  
-	- Reconnection can be done with the following command (*Grab this from your other document*)
-	- This needs to be aliased.
+	- Reconnection can be done with the following command : `sudo mount -t cifs //140.226.100.108/FelsenNASFolder /mnt/flnas -o username=felsenlab`
 - It is recommended that you copy your data from the FelsenNAS to the workstation you're using. Some steps of the pipeline are notably slower over when fetching data over the network.
 - Verify that all data is contained in your session.
 	- Right click on the session-level directory and select 'Properties'.
@@ -59,21 +58,6 @@ Information related to putative and real saccade events.
 - What does each module do?
 	- Concise recap. This information is in the data description, but putting some lines here is helpful for end-users so they know the steps in the process
 
-
-### Additional considerations
-- [ ] Documentation
-- [ ] Debugging DLC
-	- [ ] Running on GPU
-- [ ] Add function for swap the DLC model
-- [ ] Why does DREAD13 have frame mismatch (extract_saccades.py)
-	- Find a few that throw this.
-	- See similarities between.
-	- See if there's a way to address this.
-- [ ] ~~Dump stim information
-- Not bother putting the stimulus metadata in.
-- [ ] Throw full LabJack traces into the results file.
-- Testing crystal's stuff
-- [ ] Average waveform - left waveforms in left blocks, right waveforms in right blocks
 
 - Talking w/ Anna and Crystal about how to use these things.
 
