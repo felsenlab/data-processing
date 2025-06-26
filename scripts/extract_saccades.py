@@ -69,6 +69,7 @@ def compute_frame_timestamps_for_crystals_sessions(
     """
     """
 
+    home_folder = pl.Path(home_folder)
     timestamp_files = list(home_folder.joinpath('videos').rglob('*_timestamps.txt'))
     frameTimestamps = None
     for f in timestamp_files:
@@ -107,7 +108,7 @@ def align_saccades_to_LJ(homeFolder, outfile, lj_combined_file, namespace):
     This is done by finding the nearest frame timestamp to each saccade onset and offset.
     """
 
-    if namespace.is_crystal == 0:
+    if namespace.processing_path == 0 or namespace.processing_path == 1:
         lj_data = np.load(lj_combined_file)
         frame_signal = lj_data[:,7]
 
@@ -116,6 +117,7 @@ def align_saccades_to_LJ(homeFolder, outfile, lj_combined_file, namespace):
         frame_times = lj_data[frame_edge_inds,0]
         # Convert to seconds since 
     else:
+        # namespace.processing_path = 2, so this is a Crystal session
         frame_times = compute_frame_timestamps_for_crystals_sessions(homeFolder)
 
     # Placing within outfile
@@ -136,12 +138,15 @@ def align_saccades_to_LJ(homeFolder, outfile, lj_combined_file, namespace):
 
         # sacc_onsets are the indices of the saccade onsets in the frame time.
         # Align each frame index to the nearest frame time (found in frame_times)
-        frame_numbers = np.arange(len(frame_edge_inds))
-        sacc_onset_indices  = np.interp(sacc_onsets,  frame_numbers, frame_edge_inds).astype('int')
-        sacc_offset_indices = np.interp(sacc_offsets, frame_numbers, frame_edge_inds).astype('int')
-
-        sacc_onset_seconds = frame_times[sacc_onset_indices]
-        sacc_offset_seconds = frame_times[sacc_offset_indices]
+        frame_numbers = np.arange(len(frame_times))
+        if namespace.processing_path in [0, 1]:
+            sacc_onset_indices  = np.interp(sacc_onsets,  frame_numbers, frame_edge_inds).astype('int')
+            sacc_offset_indices = np.interp(sacc_offsets, frame_numbers, frame_edge_inds).astype('int')
+            sacc_onset_seconds = frame_times[sacc_onset_indices]
+            sacc_offset_seconds = frame_times[sacc_offset_indices]
+        else:
+            sacc_onset_seconds = np.interp(sacc_onsets, frame_numbers, frame_times)
+            sacc_offset_seconds = np.interp(sacc_offsets, frame_numbers, frame_times)
 
         # Sve the aligned saccade onsets and offsets
         saccades_group.create_dataset('saccade_onsets_seconds',  data=sacc_onset_seconds)
@@ -155,7 +160,7 @@ def align_saccades_to_LJ(homeFolder, outfile, lj_combined_file, namespace):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('home', type=str, help='Home folder for the session')
-    parser.add_argument('is_crystal', type=int, help='0 - file has LJ for timestamping. 1 - Crystals data, keep in frame clock')
+    parser.add_argument('processing_path', type=int, help='0 - Session w/ labjack, ephys. 1 - Session w/ labjack, ephys, strai gauge. 2 - Crystals data, keep in frame clock')
     namespace = parser.parse_args()
     fileSets = collectFileSets(namespace.home)
     config = locateSaccadeExtractionProject()
@@ -245,12 +250,13 @@ if __name__ == '__main__':
         # Align saccades to LabJack timestamps if LJ exists
         lj_dir = os.path.join(namespace.home, 'labjack')
         lj_file_maybe = glob(os.path.join(lj_dir, 'labjack_combined*.npy'))
-        #assert len(lj_file_maybe) > 0, "No secondary labjack file found, aborting."
-        if len(lj_file_maybe) > 0:
+        if namespace.processing_path in [0, 1]:
             lj_combined_file = max(lj_file_maybe, key=os.path.getmtime)
-            align_saccades_to_LJ(namespace.home, outfile, lj_combined_file, namespace)
         else:
-            print('No LabJack file found for aligning saccades. Skipping alignment.')
+            lj_combined_file = None
+        align_saccades_to_LJ(namespace.home, outfile, lj_combined_file, namespace)
+
+
 
     # Answers are given without subframe precision (values calculated from nearest frame index)
     outfile.close()

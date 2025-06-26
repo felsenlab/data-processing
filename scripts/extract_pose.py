@@ -68,11 +68,14 @@ def analyzeVideos(*args, **kwargs):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('home', type=str, help='Home folder for the session')
+    parser.add_argument('processing_path', type=int, help='Home folder for the session')
+    
     namespace = parser.parse_args()
     
     config = locateDeeplabcutProject()
     videos = collectVideos(namespace.home)
     videos = [video for video in videos if 'labeled' not in video] # Exclude labeled videos
+
     if len(videos) == 0:
         print('No videos found to analyze')
         exit(-1)

@@ -214,5 +214,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('home', type=str, help='Home folder for the session')
     parser.add_argument('sig_source', type=int, help='0 for LabJack, 1 for Neuropixels')
+    parser.add_argument('processing_path', type=int, help='0 - Session w/ labjack, ephys. 1 - Session w/ labjack, ephys, strai gauge. 2 - Crystals data, keep in frame clock')
     namespace = parser.parse_args()
-    extract_barcodes(namespace.home, namespace.sig_source)
+
+    if namespace.processing_path != 2:
+        # If processing_path is not 2, we can proceed with barcode extraction
+        if namespace.sig_source not in [0, 1]:
+            print("Invalid signal source. Use 0 for LabJack or 1 for Neuropixels.")
+            sys.exit(-1)
+        extract_barcodes(namespace.home, namespace.sig_source)
+    else:
+        print("Skipping barcode extraction for crystals data.")

@@ -113,6 +113,11 @@ def align_barcodes(homeFolder):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('home', type=str, help='Home folder for the session')
+    parser.add_argument('processing_path', type=int, help='0 - Session w/ labjack, ephys. 1 - Session w/ labjack, ephys, strai gauge. 2 - Crystals data, keep in frame clock')
     namespace = parser.parse_args()
-    align_barcodes(namespace.home)
+
+    if namespace.processing_path != 2:
+        align_barcodes(namespace.home)
+    else:
+        print("No need to align barcodes for crystals data, exiting.")
     

@@ -16,6 +16,8 @@ from numpy import savetxt
 
 import h5py
 
+from tqdm import tqdm
+
 def combine_LJ_data(homeFolder):
     """ Pilfered (with permission) from ONECore DAQ Synchronization project
         (https://optogeneticsandneuralengineeringcore.gitlab.io/ONECoreSite/projects/DAQSyncro/DAQSyncronization/)
@@ -36,8 +38,8 @@ def combine_LJ_data(homeFolder):
     
     file_name_list = os_sorted(os.listdir(lj_in_data_dir))
     
-    for file_name in file_name_list:
-        print(file_name)
+    #for file_name in file_name_list:
+    for file_name in tqdm(file_name_list, desc='Processing LabJack files'):
         if file_name[-3:] == 'dat':      # Only run on .dat files output from the LJ
             file_name_list_dir = os.path.join(lj_in_data_dir, file_name)
 
@@ -119,5 +121,10 @@ def combine_LJ_data(homeFolder):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('home', type=str, help = 'Home folder for the session')
+    parser.add_argument('processing_path', type=int, help='0 - Session w/ labjack, ephys. 1 - Session w/ labjack, ephys, strai gauge. 2 - Crystals data, keep in frame clock')
     namespace = parser.parse_args()
-    combine_LJ_data(namespace.home)
+    
+    if namespace.processing_path != 2:
+        combine_LJ_data(namespace.home)
+    else:
+        print('Skipping combine_LJ_data for crystals data')
