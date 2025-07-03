@@ -45,7 +45,7 @@ conda deactivate
 # #####
 # # Extract pose estimates
 log "INFO" "Extracting pose estimates"
-conda activate deeplabcut
+conda activate dlc_gpu_tf
 python ./scripts/extract_pose.py "$HOME_FOLDER" "$PROCESSING_PATH" 
 conda deactivate
 
