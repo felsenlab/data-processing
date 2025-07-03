@@ -16,8 +16,10 @@ import logging
 # Define search terms for filtering the data
 # Each search term must be a list, even if there's only one term.
 search_terms = dict(
-    name = ['pitx010', 'pitx012'],
-    description = ['Dosage 0mg/kg'],
+    #name = ['pitx010', 'pitx012'],
+    name = [],
+    #description = ['Dosage 0mg/kg'],
+    description = [],
     weight = ['weight>20g'] # weight doesn't work yet, needs to be fixed.
 )
 
@@ -27,69 +29,12 @@ date_pattern = re.compile(r'^\d{4}-\d{2}-\d{2}$')
 output_path = 'combined_analysis.h5'
 ###########################################################
 
-
-def copy_hdf5_recursive(src_group, dst_group):
-    """
-    Recursively copy HDF5 group structure with full preservation
-    """
-    # Copy attributes of current group
-    for attr_name in src_group.attrs:
-        dst_group.attrs[attr_name] = src_group.attrs[attr_name]
-    
-    # Iterate through all items
-    for key in src_group.keys():
-        src_item = src_group[key]
-        
-        if isinstance(src_item, h5py.Group):
-            # Create new group and recurse
-            dst_subgroup = dst_group.create_group(key)
-            copy_hdf5_recursive(src_item, dst_subgroup)
-            
-        elif isinstance(src_item, h5py.Dataset):
-            # Copy dataset with all metadata
-            dst_group.copy(src_item, key)
-
-
-
-def combine_sessions(file_paths, output_path, session_naming=None):
-    """
-    Combine multiple HDF5 session files into one analysis file
-    """
-    with h5py.File(output_path, 'w') as analysis_file:
-        for i, dir_path in enumerate(file_paths):
-            results_path = os.path.join(dir_path, 'results.h5')
-            
-            if not os.path.exists(results_path):
-                logging.warning(f"File not found: {results_path}")
-                continue
-                
-            try:
-                with h5py.File(results_path, 'r') as session_file:
-                    # Create session group with meaningful name
-                    date = dir_path.parent.name
-                    session_num = dir_path.name
-                    session_name = f"{date}_{session_num}"
-                    
-                    session_group = analysis_file.create_group(session_name)
-                    
-                    # Copy everything recursively
-                    copy_hdf5_recursive(session_file, session_group)
-                    
-                    # Add metadata about source
-                    session_group.attrs['source_path'] = dir_path
-                    session_group.attrs['session_index'] = i
-                    
-            except Exception as e:
-                logging.error(f"Error processing {results_path}: {e}")
-                continue
-
-
-
-
 doses = list()
 names = list()
 weights = list()
-all_indexed_paths = list()
+# Has a session-level h5 file and contains at least some data.
+paths_with_h5_info = list()
+all_paths = list()
 has_saccades = list()
 
 date_dirs = [
@@ -104,9 +49,9 @@ for date_dir in date_dirs:
     ]
     for session_dir in session_dirs:
         files = os.listdir(session_dir)
-
+        all_paths.append(session_dir)
         if 'results.h5' in files and os.path.getsize(os.path.join(session_dir, 'results.h5')) > 0:
-            all_indexed_paths.append(session_dir)
+            paths_with_h5_info.append(session_dir)
             h5_file_path = os.path.join(session_dir, 'results.h5')
 
             with h5py.File(h5_file_path, 'r') as data:
@@ -145,14 +90,31 @@ for combination, count in counts.items():
 print()
 
 
-doses_filter = [dose in search_terms['description'] if dose else False for dose in doses]
-names_filter = [name in search_terms['name'] if name else False for name in names]
+
+if search_terms['description'] == []:
+    doses_filter = [True] * len(paths_with_h5_info)
+else:
+    doses_filter = [dose in search_terms['description'] if dose else False for dose in doses]
+
+if search_terms['name'] == []:
+    names_filter = [True] * len(paths_with_h5_info)
+else:    
+    names_filter = [name in search_terms['name'] if name else False for name in names]
 # Weights does not work yet. Slightly more complicated because it's a different conditional.
 #weights_filter = [weight is not None and weight > float(search_terms['weight'].split('>')[1][:-1]) for weight in weights]
 
 
 final_filter = np.logical_and(doses_filter, names_filter)
-matching_search_paths = np.array(all_indexed_paths)[final_filter]
+matching_search_paths = np.array(paths_with_h5_info)[final_filter]
+
+
+# Text menu :
+#   1. Show all paths matching search criteria
+#   2. Export all paths, regardless of search criteria, to a text file
+#   3. Combine all matching paths into a single h5 file
+#   (This gives you all sessions so you can initialize everything, process, then combine)
+#   4. Exit
+
 
 for path in matching_search_paths:
     print(f"Matching path: {path}")
@@ -160,7 +122,6 @@ for path in matching_search_paths:
 user_in = input("Do you want to combine these files? (y/n): ")
 if user_in.lower() == 'y':
     # Load the data from all matching files and combine them
-    #combine_sessions(matching_search_paths, 'combined_analysis.h5')
     with h5py.File(output_path, 'a') as dest:
         for dir_path in matching_search_paths:
             results_file = os.path.join(dir_path, 'results.h5')
@@ -175,8 +136,6 @@ if user_in.lower() == 'y':
                 for attr_name, attr_value in src.attrs.items():
                     session_group.attrs[attr_name] = attr_value
             
-
-
 elif user_in.lower() == 'n':
     user_in = input("Do you want to export the file list to a text file? (y/n): ")
     if user_in.lower() == 'y':
@@ -185,19 +144,3 @@ elif user_in.lower() == 'n':
                 f.write(f"{path}\n")
         print("File list exported successfully.")
 
-code.interact(local=dict(globals(), **locals()))
-
-
-# Cookbook - 
-# 1. Point script to data directory
-# 2. Find all h5 files for each session
-# 3. Grab animal_info from each file
-# 4. Check if animal_info contains the search terms
-# 5. All files matching the search terms are added to a list
-# 6. Show list of files matching to the user
-# 7. Ask user if they want to load the data from these files
-# 8. If yes, concatenate the data from all files into a single dataset
-# 9. If no, exit the script to allow user to change search terms or directory
-
-
-code.interact(local=dict(globals(), **locals()))

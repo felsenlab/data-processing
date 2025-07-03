@@ -232,7 +232,7 @@ if __name__ == '__main__':
         # Place in saccades/left or saccades/right
         if 'leftCam' in saccade_result:
             sacc_group = outfile.create_group('saccades/left')
-        elif 'rightCam' in saccade_result:
+        elif 'rightCam' in saccade_recode.interact(local=dict(globals(), **locals()))sult:
             sacc_group = outfile.create_group('saccades/right')
         else:
             continue

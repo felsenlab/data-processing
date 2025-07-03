@@ -44,40 +44,40 @@ conda deactivate
 
 # #####
 # # Extract pose estimates
-# log "INFO" "Extracting pose estimates"
-# conda activate deeplabcut
-# python ./scripts/extract_pose.py "$HOME_FOLDER" "$PROCESSING_PATH" 
-# conda deactivate
+log "INFO" "Extracting pose estimates"
+conda activate deeplabcut
+python ./scripts/extract_pose.py "$HOME_FOLDER" "$PROCESSING_PATH" 
+conda deactivate
 
-# # Extract real saccades
-# log "INFO" "Extracting real saccades"
-# conda activate se
-# python ./scripts/extract_saccades.py "$HOME_FOLDER" "$PROCESSING_PATH"
-# conda deactivate
+# Extract real saccades
+log "INFO" "Extracting real saccades"
+conda activate se
+python ./scripts/extract_saccades.py "$HOME_FOLDER" "$PROCESSING_PATH"
+conda deactivate
 
-# # Extract and consolidate LabJack .dat files
-# log "INFO" "Consolidating LabJack data"
-# conda activate genwork
-# python ./scripts/combine_LJ_data.py "$HOME_FOLDER" "$PROCESSING_PATH"
-# conda deactivate
+# Extract and consolidate LabJack .dat files
+log "INFO" "Consolidating LabJack data"
+conda activate genwork
+python ./scripts/combine_LJ_data.py "$HOME_FOLDER" "$PROCESSING_PATH"
+conda deactivate
 
-# # Extract barcodes from LabJack
-# log "INFO" "Extracting barcodes from LabJack"
-# conda activate genwork
-# python ./scripts/extract_barcodes.py "$HOME_FOLDER" 0 "$PROCESSING_PATH"
-# conda deactivate
+# Extract barcodes from LabJack
+log "INFO" "Extracting barcodes from LabJack"
+conda activate genwork
+python ./scripts/extract_barcodes.py "$HOME_FOLDER" 0 "$PROCESSING_PATH"
+conda deactivate
 
-# # Extract barcodes from NeuroPixel, 
-# log "INFO" "Extracting barcodes from NeuroPixel device"
-# conda activate genwork
-# python ./scripts/extract_barcodes.py "$HOME_FOLDER" 1 "$PROCESSING_PATH"
-# conda deactivate
+# Extract barcodes from NeuroPixel, 
+log "INFO" "Extracting barcodes from NeuroPixel device"
+conda activate genwork
+python ./scripts/extract_barcodes.py "$HOME_FOLDER" 1 "$PROCESSING_PATH"
+conda deactivate
 
-# # Align NPX clock and spikes to LabJack time
-# log "INFO" "Aligning NeuroPixel events to LabJack time"
-# conda activate genwork
-# python ./scripts/align_npx_to_LJ.py "$HOME_FOLDER" "$PROCESSING_PATH"
-# conda deactivate
+# Align NPX clock and spikes to LabJack time
+log "INFO" "Aligning NeuroPixel events to LabJack time"
+conda activate genwork
+python ./scripts/align_npx_to_LJ.py "$HOME_FOLDER" "$PROCESSING_PATH"
+conda deactivate
 
 
 

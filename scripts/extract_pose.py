@@ -23,7 +23,7 @@ def locateDeeplabcutProject(
     """
     """
 
-    return '/home/schollab-dion/Documents/DeepLabCut/sacnet3-felsenlab-2025-03-24/config.yaml'
+    return '/home/schollab-dion/Documents/DeepLabCut/sacnet-josh-2025-01-29/config.yaml'
 
 def collectVideos(
     homeFolder,
@@ -155,14 +155,14 @@ if __name__ == '__main__':
         pose_dlc.create_dataset('eye_ventral_y', data=dlc_results[:, 10])
         pose_dlc.create_dataset('pupil_center_x', data=dlc_results[:, 12])
         pose_dlc.create_dataset('pupil_center_y', data=dlc_results[:, 13])
-        pose_dlc.create_dataset('pupil_nasal_x', data=dlc_results[:, 15])
-        pose_dlc.create_dataset('pupil_nasal_y', data=dlc_results[:, 16])
-        pose_dlc.create_dataset('pupil_temporal_x', data=dlc_results[:, 18])
-        pose_dlc.create_dataset('pupil_temporal_y', data=dlc_results[:, 19])
-        pose_dlc.create_dataset('pupil_dorsal_x', data=dlc_results[:, 21])
-        pose_dlc.create_dataset('pupil_dorsal_y', data=dlc_results[:, 22])
-        pose_dlc.create_dataset('pupil_ventral_x', data=dlc_results[:, 24])
-        pose_dlc.create_dataset('pupil_ventral_y', data=dlc_results[:, 25])
+        #pose_dlc.create_dataset('pupil_nasal_x', data=dlc_results[:, 15])
+        #pose_dlc.create_dataset('pupil_nasal_y', data=dlc_results[:, 16])
+        #pose_dlc.create_dataset('pupil_temporal_x', data=dlc_results[:, 18])
+        #pose_dlc.create_dataset('pupil_temporal_y', data=dlc_results[:, 19])
+        #pose_dlc.create_dataset('pupil_dorsal_x', data=dlc_results[:, 21])
+      #  pose_dlc.create_dataset('pupil_dorsal_y', data=dlc_results[:, 22])
+        #pose_dlc.create_dataset('pupil_ventral_x', data=dlc_results[:, 24])
+        #pose_dlc.create_dataset('pupil_ventral_y', data=dlc_results[:, 25])
         # Force the file to flush to disk
         outfile.flush()
 
