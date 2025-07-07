@@ -8,12 +8,12 @@ import pathlib as pl
 import numpy as np
 import h5py
 
-from data_processing import PrintSuppressor
-try:
-    with PrintSuppressor():
-        import deeplabcut as dlc
-except ImportError:
-    dlc = None
+#from data_processing import PrintSuppressor
+#try:
+   # with PrintSuppressor():
+import deeplabcut as dlc
+#except ImportError:
+   # dlc = None
 
 from glob import glob
 
@@ -133,7 +133,7 @@ if __name__ == '__main__':
         # pupil - center, nasal, temporal, dorsal, ventral
         # ... and there's x, y and a confidence value for each point.
         # This means we expect 9 trackpoints * 3 (x, y, confidence) = 27 columns 
-        expected_columns = 27
+        expected_columns = 15
         if dlc_results.shape[1] < expected_columns:
             print(f'Unexpected number of columns found for {which_cam} camera. Skipping.')
             continue
