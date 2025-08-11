@@ -243,6 +243,7 @@ if __name__ == '__main__':
 
         sacc_group.create_dataset('labels', data=saccade_data['saccade_labels'][:])
         sacc_group.create_dataset('labels_coded', data=saccade_data['saccade_labels_coded'][:])
+        sacc_group.create_dataset('saccade_label_mapping', data=saccade_data['saccade_label_mapping'][:])
         sacc_group.create_dataset('onsets', data = saccade_data['saccade_onset'][:])
         sacc_group.create_dataset('offsets', data = saccade_data['saccade_offset'][:])
         sacc_group.create_dataset('waveforms', data= saccade_data['saccade_waveforms'][:])
