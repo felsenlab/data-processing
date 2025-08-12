@@ -8,6 +8,9 @@ import logging
 import contextlib
 import pathlib as pl
 
+import logging
+logger = logging.getLogger(__name__)
+
 # This should go in a helper script file
 def parse_experiment_file(file_path):
     """
@@ -123,10 +126,12 @@ def store_string_dict_to_hdf5(file_path, data_dict, group_name):
                 grp.create_dataset(key, data=value, shape=1, dtype=h5py.string_dtype())
                 
             # The file will be automatically flushed and closed at the end of the 'with' block
-            print(f"Data stored successfully in group '{group_name}'.")
+            #print(f"Data stored successfully in group '{group_name}'.")
+            logger.info(f"Data stored successfully in group '{group_name}'.")
             
     except Exception as e:
-        print(f"An error occurred: {e}")
+        logger.exception()
+        #print(f"An error occurred: {e}")
     
 
 

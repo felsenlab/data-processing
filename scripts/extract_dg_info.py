@@ -7,6 +7,8 @@ from data_processing import PrintSuppressor
 
 import h5py
 
+import logging
+logger = logging.getLogger(__name__)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')

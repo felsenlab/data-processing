@@ -17,6 +17,9 @@ import deeplabcut as dlc
 
 from glob import glob
 
+import logging
+logger = logging.getLogger(__name__)
+
 # TODO: Make this more intelligent/flexible
 def locateDeeplabcutProject(
     ):
@@ -77,11 +80,13 @@ if __name__ == '__main__':
     videos = [video for video in videos if 'labeled' not in video] # Exclude labeled videos
 
     if len(videos) == 0:
-        print('No videos found to analyze')
+        #print('No videos found to analyze')
+        logger.error('No videos found to analyze')
         exit(-1)
-    print('Found the following videos to analyze:')
-    for video in videos:
-        print(video)
+    #print('Found the following videos to analyze:')
+    logger.info(f'Found the following videos to analyze:{'\n\t'.join(videos)}')
+    #for video in videos:
+    #    print(video)
 
     # If we don't want to analyze videos, we can skip this step
     # Analyze videos
@@ -100,7 +105,8 @@ if __name__ == '__main__':
     right_cam_dlc = next((f for f in recent_files if 'rightCam' in f), None)
 
     if left_cam_dlc is None and right_cam_dlc is None:
-        print('No DeepLabCut results found. Exiting.')
+        #print('No DeepLabCut results found. Exiting.')
+        logger.error('No DeepLabCut results found. Exiting.')
         exit(-1)
     # Can be None if no results are found for a camera
     files_to_insert = [left_cam_dlc, right_cam_dlc]
@@ -117,14 +123,16 @@ if __name__ == '__main__':
         if f is None:
             continue
         which_cam = 'left' if 'leftCam' in f else 'right'
-        print(f'Inserting results for {which_cam} camera')
+        #print(f'Inserting results for {which_cam} camera')
+        logger.info(f'Inserting results for {which_cam} camera')
 
         # Read the csv file
         dlc_results = np.genfromtxt(f, delimiter=',', skip_header=3)
         dlc_results = dlc_results[:, 1:]
         # Check if the results are empty
         if dlc_results.size == 0:
-            print(f'No results found for {which_cam} camera. Skipping.')
+            #print(f'No results found for {which_cam} camera. Skipping.')
+            logger.info(f'No results found for {which_cam} camera. Skipping.')
             continue
         
         # Check if the results have the expected number of columns
@@ -134,8 +142,9 @@ if __name__ == '__main__':
         # ... and there's x, y and a confidence value for each point.
         # This means we expect 9 trackpoints * 3 (x, y, confidence) = 27 columns 
         expected_columns = 15
-        if dlc_results.shape[1] < expected_columns:
-            print(f'Unexpected number of columns found for {which_cam} camera. Skipping.')
+        if dlc_results.shape[1] < expected_columns: ##TODO are we concerned that more than the expected columns passes?
+            #print(f'Unexpected number of columns found for {which_cam} camera. Skipping.')
+            logger.warning(f'Unexpected number of columns ({dlc_results.shape[1]} != {expected_columns}) found for {which_cam} camera. Skipping.')
             continue
         # Create a group for the camera
         pose_group = outfile.create_group('/pose/' + which_cam)
@@ -167,7 +176,8 @@ if __name__ == '__main__':
         outfile.flush()
 
     outfile.close()
-    print('Pose extraction completed. Results saved to results.h5')
+    #print('Pose extraction completed. Results saved to results.h5')
+    logger.info('Pose extraction completed. Results saved to {outfile}')
     
     #code.interact(local=dict(globals(), **locals()))
 

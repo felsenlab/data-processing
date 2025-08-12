@@ -18,6 +18,9 @@ import h5py
 
 from tqdm import tqdm
 
+import logging
+logger = logging.getLogger(__name__)
+
 def combine_LJ_data(homeFolder):
     """ Pilfered (with permission) from ONECore DAQ Synchronization project
         (https://optogeneticsandneuralengineeringcore.gitlab.io/ONECoreSite/projects/DAQSyncro/DAQSyncronization/)
@@ -73,8 +76,9 @@ def combine_LJ_data(homeFolder):
                         # Combine later arrays to first file's array.
                         lj_array = np.concatenate((lj_array, data_body_np), axis=0)
                     except ValueError: # Error caused if arrays' column dimensions don't line up (wrong data type)
-                        print("Data from ", file_name, " doesn't match dimensions of '",
-                            first_numpy_array, "'. Please check files.")
+                        #print("Data from ", file_name, " doesn't match dimensions of '",
+                        #    first_numpy_array, "'. Please check files.")
+                        logger.exception(f"Data from {file_name}, doesn't match dimensions of {first_numpy_array}. Please check files.")
 
             # Convert data into string format for clean .csv output
             for irow_body in range(data_body_np.shape[0]):
@@ -93,7 +97,8 @@ def combine_LJ_data(homeFolder):
     if save_npy:
         output_file = os.path.join(lj_out_data_dir, out_file_name + time_now)
         np.save(output_file, lj_array)
-        print("File has been saved in .npy format here: ", output_file)
+        #print("File has been saved in .npy format here: ", output_file)
+        logger.info(f"File has been saved in .npy format here: {output_file}")
 
     if save_csv:
         if header_present and keep_header: # Clean up the header info for attachment to data
@@ -113,7 +118,8 @@ def combine_LJ_data(homeFolder):
 
         output_file = os.path.join(lj_out_data_dir, (out_file_name + time_now + '.csv'))
         savetxt(output_file, lj_mat_w_header, delimiter=',', fmt="%s")
-        print("File has been saved in .csv format here: ", output_file)
+        #print("File has been saved in .csv format here: ", output_file)
+        logger.info(f"File has been saved in .csv format here: {output_file}")
 
 
 
@@ -127,4 +133,5 @@ if __name__ == '__main__':
     if namespace.processing_path != 2:
         combine_LJ_data(namespace.home)
     else:
-        print('Skipping combine_LJ_data for crystals data')
+        #print('Skipping combine_LJ_data for crystals data')
+        logger.warning('Skipping combine_LJ_data for crystals data')

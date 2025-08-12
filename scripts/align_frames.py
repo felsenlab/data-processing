@@ -15,16 +15,19 @@ import h5py
 
 from scipy.signal import find_peaks
 
+import logging
+logger = logging.getLogger(__name__)
+
 def align_frames_to_LJ(homeFolder):
     """
     """
     outfile_name = os.path.join(homeFolder, 'results.h5')
-    assert os.path.exists(outfile_name), 'Outfile for results not found for this session!'
+    assert os.path.exists(outfile_name), 'Outfile for results not found for this session!' ##TODO remove asserts --> handle data validation correctly
     outfile = h5py.File(outfile_name, 'a')
 
     lj_dir = os.path.join(homeFolder, 'labjack')
     lj_file_maybe = glob(os.path.join(lj_dir, 'labjack_combined*.npy'))
-    assert len(lj_file_maybe) > 0, "No secondary labjack file found, aborting."
+    assert len(lj_file_maybe) > 0, "No secondary labjack file found, aborting." ##TODO remove asserts --> handle data validation correctly
 
     lj_file = max(lj_file_maybe, key=os.path.getmtime)
     lj_data = np.load(lj_file)
@@ -40,7 +43,8 @@ def align_frames_to_LJ(homeFolder):
     pose_group = outfile['pose/right']
     dataset_name = 'frametimes_clock'
     if dataset_name in pose_group:
-        print(f"Warning: Dataset '{dataset_name}' already exists. Overwriting...")
+        #print(f"Warning: Dataset '{dataset_name}' already exists. Overwriting...")
+        logger.warning(f"Warning: Dataset '{dataset_name}' already exists. Overwriting...")
         del pose_group[dataset_name]  # Delete existing dataset
             
     # Create the new dataset in the pose_dlc group
@@ -80,7 +84,8 @@ def align_frames_to_LJ(homeFolder):
 
     else:
         # Should verify that this goes to the processing log
-        print('No saccade extraction results detected for this session')
+        #print('No saccade extraction results detected for this session')
+        logger.error('No saccade extraction results detected for this session')
 
     # If Crystal's data, 
 
@@ -93,7 +98,7 @@ def align_saccades_to_frames(homeFolder):
         calculating needed information for Crystal's data.
     '''
     outfile_name = os.path.join(homeFolder, 'results.h5')
-    assert os.path.exists(outfile_name), 'Outfile for results not found for this session!'
+    assert os.path.exists(outfile_name), 'Outfile for results not found for this session!' ##TODO remove asserts --> handle data validation correctly
     outfile = h5py.File(outfile_name, 'a')
     code.interact(local=dict(globals(), **locals()))
 
