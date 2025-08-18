@@ -2,7 +2,7 @@ import os
 import code
 import argparse
 import pathlib as pl
-from data_processing import PrintSuppressor
+#from data_processing import PrintSuppressor
 try:
     import saccade_extraction as se
 except:
@@ -63,14 +63,15 @@ def extractSaccades(*args, **kwargs):
 
 def compute_frame_timestamps_for_crystals_sessions(
     home_folder,
-    side='right',
-    lag=-4.37
+    side='right', ## We only need to extract timestamps for one side, since the other side will be aligned to the same timestamps. 
+    lag=-4.37 ## 4.37 seconds is the MEAN time between clicking "start" and the first stimulus appearing on screen. We subtract this from the first stimulus timestamp to generate frametimestamps
     ):
     """
     """
 
     home_folder = pl.Path(home_folder)
     timestamp_files = list(home_folder.joinpath('videos').rglob('*_timestamps.txt'))
+
     frameTimestamps = None
     for f in timestamp_files:
         if side in f.name.lower():
@@ -119,6 +120,7 @@ def align_saccades_to_LJ(homeFolder, outfile, lj_combined_file, namespace):
     else:
         # namespace.processing_path = 2, so this is a Crystal session
         frame_times = compute_frame_timestamps_for_crystals_sessions(homeFolder)
+        #print(frame_times)
 
     # Placing within outfile
     pose_group = outfile['pose/right']
@@ -134,7 +136,10 @@ def align_saccades_to_LJ(homeFolder, outfile, lj_combined_file, namespace):
     if 'saccades' in outfile:
         saccades_group = outfile['saccades/right'] if 'right' in outfile['saccades'] else outfile['saccades/left']
         sacc_onsets = saccades_group['onsets'][:].astype('int')
-        sacc_offsets = saccades_group['offsets'][:].astype('int')
+        #print(f'saccade offsets: {saccades_group["offsets"]}, nan_indices: {np.where(np.isnan(saccades_group["offsets"]))}, num_nan: {np.where(np.isnan(saccades_group["offsets"]))[0].shape[0]}, tot_offsets: {sacc_group["offsets"].shape}')
+        sacc_offsets = saccades_group['offsets'][:].astype('int') ## This error is due to the presence of nans --> this is expected for noise events (putative saccades that were not real saccades)
+        #print(saccades_group['offsets'][:])
+        #print(saccades_group['offsets'][:].dtype)
 
         # sacc_onsets are the indices of the saccade onsets in the frame time.
         # Align each frame index to the nearest frame time (found in frame_times)

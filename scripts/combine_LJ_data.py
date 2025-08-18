@@ -100,9 +100,10 @@ def combine_LJ_data(homeFolder):
             data_header_cleaned = list()
 
             for data_header_row in data_header:
-                data_header_row_cleaned = str(data_header_row.decode().rstrip('\r\n').strip("\[").split('\t'))
-                data_header_row_cleaned_again = data_header_row_cleaned.strip("\[]''")
+                data_header_row_cleaned = str(data_header_row.decode().rstrip('\r\n').strip("\\[").split('\t'))
+                data_header_row_cleaned_again = data_header_row_cleaned.strip("\\[]''")
                 data_header_cleaned.append(data_header_row_cleaned_again)
+                print('successfully stripped ;)')
 
             # Attach header info to lj_mat data
             np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning) # Not cool. https://stackoverflow.com/questions/63097829/debugging-numpy-visibledeprecationwarning-ndarray-from-ragged-nested-sequences
