@@ -111,7 +111,7 @@ def align_saccades_to_LJ(homeFolder, outfile, lj_combined_file, namespace):
 
     if namespace.processing_path == 0 or namespace.processing_path == 1:
         lj_data = np.load(lj_combined_file)
-        frame_signal = lj_data[:,7]
+        frame_signal = lj_data[:,7] ##TODO: YIKES
 
         # Synchronization for frames
         frame_edge_inds = np.where(np.diff(frame_signal) != 0)[0] + 1

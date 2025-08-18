@@ -34,7 +34,7 @@ def extract_barcodes(homeFolder, which_signal):
     if which_signal == 0: # LJ
         barcodes_name = 'labjack_barcodes'
         raw_data_format = True
-        signals_column = 5
+        signals_column = 5 ##TODO: YIKES but less yikes
         expected_sample_rate = 2000 # Hz
         barcodes_dir = os.path.join(homeFolder, 'labjack')
         signals_file_maybe = glob(os.path.join(barcodes_dir, 'labjack_combined_*.npy'))

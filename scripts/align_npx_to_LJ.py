@@ -63,7 +63,7 @@ def align_barcodes(homeFolder):
 
     ### Extract Barcodes and Index Values, then Calculate Linear Variables 
     barcodes_row = 1
-    barcode_timestamps_row = 0
+    barcode_timestamps_row = 0 ##TODO: maybe yikes
 
 
     main_numpy_barcode = main_numpy_data[barcodes_row, :]
