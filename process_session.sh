@@ -66,7 +66,7 @@ log "INFO" "Extracting barcodes from LabJack"
 conda activate genwork
 python ./scripts/extract_barcodes.py "$HOME_FOLDER" 0 "$PROCESSING_PATH"
 conda deactivate
-
+PROCESSING_PATH
 # Extract barcodes from NeuroPixel, 
 log "INFO" "Extracting barcodes from NeuroPixel device"
 conda activate genwork
@@ -79,7 +79,7 @@ conda activate genwork
 python ./scripts/align_npx_to_LJ.py "$HOME_FOLDER" "$PROCESSING_PATH"
 conda deactivate
 
-
+PROCESSING_PATH
 
 # # Not yet implemented
 # # Timestamp stimulus information
