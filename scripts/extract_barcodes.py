@@ -13,6 +13,8 @@ from glob import glob
 import numpy as np
 from scipy.signal import find_peaks
 
+import logging
+logger = logging.getLogger(__name__)
 
 def extract_barcodes(homeFolder, which_signal):
 
@@ -40,6 +42,7 @@ def extract_barcodes(homeFolder, which_signal):
         signals_file_maybe = glob(os.path.join(barcodes_dir, 'labjack_combined_*.npy'))
         # If multiple are present, select the most recent.
         #code.interact(local=dict(globals(), **locals())) 
+        ## TODO --> asserts are not the correct way to handle data validation (they are not guaranteed to execute)
         assert len(signals_file_maybe) > 0, "No consolidated labjack file found for barcode extraction."
         signals_file = max(signals_file_maybe, key=os.path.getmtime)
     elif which_signal == 1: # NPX
@@ -51,6 +54,7 @@ def extract_barcodes(homeFolder, which_signal):
         signals_file = os.path.join(barcodes_dir, 'timestamps.npy')
     else:
         # TODO Better error raising here
+        logger.error("Terminating barcode extraction. \n Value beyond 0 or 1 given for signal source.")
         assert False, " Terminating barcode extraction. \n Value beyond 0 or 1 given for signal source."
 
     # Global variables and tolerances
@@ -70,7 +74,8 @@ def extract_barcodes(homeFolder, which_signal):
         signals_located = True
     except:
         signals_numpy_data = ''
-        print("Signals .npy file not located; please check your filepath")
+        #print("Signals .npy file not located; please check your filepath")
+        logger.exception("Signals .npy file not located; please check your filepath ({signals_file})")
         signals_located = False
 
     # Check whether signals_numpy_data exists; if not, end script with sys.exit().
@@ -184,6 +189,7 @@ def extract_barcodes(homeFolder, which_signal):
             signals_barcodes.append(barcode)
 
     else: # If signals_located = False
+        logger.error("Data not found. Program has stopped.")
         sys.exit("Data not found. Program has stopped.")
 
     ################################################################
@@ -193,7 +199,8 @@ def extract_barcodes(homeFolder, which_signal):
     # Create merged array with timestamps stacked above their barcode values
     signals_time_and_bars_array = np.vstack((signals_barcode_start_times,
                                             np.array(signals_barcodes)))
-    print("Final Ouput: ", signals_time_and_bars_array)
+    #print("Final Ouput: ", signals_time_and_bars_array)
+    logger.info("Final Ouput: ", signals_time_and_bars_array)
 
     time_now = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
 
@@ -220,8 +227,10 @@ if __name__ == '__main__':
     if namespace.processing_path != 2:
         # If processing_path is not 2, we can proceed with barcode extraction
         if namespace.sig_source not in [0, 1]:
-            print("Invalid signal source. Use 0 for LabJack or 1 for Neuropixels.")
+            #print("Invalid signal source. Use 0 for LabJack or 1 for Neuropixels.")
+            logger.error("Invalid signal source. Use 0 for LabJack or 1 for Neuropixels. Got {namespace.sig_source}")
             sys.exit(-1)
         extract_barcodes(namespace.home, namespace.sig_source)
     else:
-        print("Skipping barcode extraction for crystals data.")
+        #print("Skipping barcode extraction for crystals data.")
+        logger.warning("Skipping barcode extraction for crystals data.")

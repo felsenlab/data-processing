@@ -14,6 +14,9 @@ from glob import glob
 from scipy import interpolate
 import h5py
 
+import logging
+logger = logging.getLogger(__name__)
+
 # Key parts of the solution to two problems:
 # 1. Non-linear drift between clocks - using interpolation instead of linear conversion
 # 2. Aligning to secondary device instead of main device
@@ -35,17 +38,17 @@ def align_barcodes(homeFolder):
     ### Select Files for Barcode Alignment 
     # First, outfile to make sure we're gtg from previously
     outfile_name = os.path.join(homeFolder, 'results.h5')
-    assert os.path.exists(outfile_name), 'Outfile for results not found for this session!'
+    assert os.path.exists(outfile_name), 'Outfile for results not found for this session!' ##TODO remove asserts --> handle data validation correctly
     outfile = h5py.File(outfile_name, 'a')
 
     main_dir= os.path.join(homeFolder, 'ephys', 'events', 'Neuropix-PXI-100.0', 'TTL_1')
     main_file_maybe = glob(os.path.join(main_dir, 'neuropixels_barcodes*.npy'))
-    assert len(main_file_maybe) > 0, "No main ephys barcodes file found, aborting." 
+    assert len(main_file_maybe) > 0, "No main ephys barcodes file found, aborting."  ##TODO remove asserts --> handle data validation correctly
     main_file = max(main_file_maybe, key=os.path.getmtime) # get most recent
 
     secondary_dir = os.path.join(homeFolder, 'labjack')
     secondary_file_maybe = glob(os.path.join(secondary_dir, 'labjack_barcodes*.npy'))
-    assert len(secondary_file_maybe) > 0, "No secondary labjack barcodes file found, aborting."
+    assert len(secondary_file_maybe) > 0, "No secondary labjack barcodes file found, aborting." ##TODO remove asserts --> handle data validation correctly
     secondary_file = max(secondary_file_maybe, key=os.path.getmtime)
 
     # Try to load the selected files; if they fail, inform the user.
@@ -53,13 +56,15 @@ def align_barcodes(homeFolder):
         main_numpy_data = np.load(main_file)
     except:
         main_numpy_data = ''
-        print("Main .npy file not located/failed to load; please check the filepath")
+        #print("Main .npy file not located/failed to load; please check the filepath")
+        logger.exception(f"Main .npy file not located/failed to load; please check the filepath ({main_file})")
 
     try:
         secondary_numpy_data = np.load(secondary_file)
     except:
         secondary_numpy_data = ''
-        print("Secondary .npy file not located/failed to load; please check the filepath")
+        #print("Secondary .npy file not located/failed to load; please check the filepath")
+        logger.exception(f"Secondary .npy file not located/failed to load; please check the filepath ({secondary_numpy_data})")
 
     ### Extract Barcodes and Index Values, then Calculate Linear Variables 
     barcodes_row = 1
@@ -119,5 +124,6 @@ if __name__ == '__main__':
     if namespace.processing_path != 2:
         align_barcodes(namespace.home)
     else:
-        print("No need to align barcodes for crystals data, exiting.")
+        #print("No need to align barcodes for crystals data, exiting.")
+        logger.warning("No need to align barcodes for crystals data, exiting.")
     

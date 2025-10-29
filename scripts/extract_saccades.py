@@ -12,6 +12,9 @@ import numpy as np
 
 from glob import glob
 
+import logging
+logger = logging.getLogger(__name__)
+
 # TODO: Make this more intelligent/flexible
 def locateSaccadeExtractionProject():
     """
@@ -92,6 +95,7 @@ def compute_frame_timestamps_for_crystals_sessions(
                     a, b, c, d, e = lines[0].rstrip('\n').split(', ')
                     t0 = float(e)
             if t0 is None:
+                logger.error('Could not identify timestamp for the first visual event')
                 raise Exception('Could not identify timestamp for the first visual event')
             
             # Add the timestamp of the first visual event + the constant lag
@@ -99,6 +103,7 @@ def compute_frame_timestamps_for_crystals_sessions(
 
     #
     if frameTimestamps is None:
+        logger.error('Could not compute frame timestamps')
         raise Exception('Could not compute frame timestamps')
 
     return frameTimestamps
@@ -126,7 +131,8 @@ def align_saccades_to_LJ(homeFolder, outfile, lj_combined_file, namespace):
     pose_group = outfile['pose/right']
     dataset_name = 'frametimes_clock'
     if dataset_name in pose_group:
-        print(f"Warning: Dataset '{dataset_name}' already exists. Overwriting...")
+        #print(f"Warning: Dataset '{dataset_name}' already exists. Overwriting...")
+        logging.warning(f"Warning: Dataset '{dataset_name}' already exists. Overwriting...")
         del pose_group[dataset_name]  # Delete existing dataset
 
     # Create the new dataset in the pose_dlc group
@@ -159,7 +165,7 @@ def align_saccades_to_LJ(homeFolder, outfile, lj_combined_file, namespace):
     
         outfile.flush()
     else:
-        print('No saccades found in outfile to align to LabJack timestamps. Skipping alignment.')
+        #print('No saccades found in outfile to align to LabJack timestamps. Skipping alignment.')
 
 
 if __name__ == '__main__':
@@ -177,7 +183,8 @@ if __name__ == '__main__':
     left_cam_dlc  = next((f for f in recent_files if 'leftCam' in f[0].name), None)
     right_cam_dlc = next((f for f in recent_files if 'rightCam' in f[0].name), None)
     if left_cam_dlc is None and right_cam_dlc is None:
-        print('No pose estimates found for left or right cameras.')
+        #print('No pose estimates found for left or right cameras.')
+        logger.warning('No pose estimates found for left or right cameras (left_cam_dlc and right_cam_dlc are None).')
         exit(-1)
     fileSets = [left_cam_dlc, right_cam_dlc]
     fileSets = [fs for fs in fileSets if fs is not None]  # Filter out None values
@@ -194,9 +201,13 @@ if __name__ == '__main__':
         )
         #code.interact(local=dict(globals(), **locals()))
         # Check processed is valid
-        if processed is None or frameTimestamps is None:
-            print(f'Invalid pose estimates in {f}. Skipping.')
-            continue
+        #if processed is None or frameTimestamps is None:
+            #print(f'Invalid pose estimates in {f}. Skipping.')
+         #   continue
+        if processed is None:
+            logger.warning(f'Pose estimates for {f} are NoneType. Skipping')
+        elif frameTimestamps is None:
+            logger.warning(f'frameTimestamps for {f} are NoneType. Skipping')
         # Save to correct group in outfile to match left or right camera
         if 'leftCam' in f[0].name:
             #pose_group = outfile.create_group('pose/left')
@@ -213,7 +224,8 @@ if __name__ == '__main__':
     # Check for previous saccade extraction results
     prev_saccades = glob(os.path.join(namespace.home, 'videos','*saccades.hdf'))
     if len(prev_saccades) > 0:
-        print('Previous saccade extraction results found. Overwriting these results.')
+        #print('Previous saccade extraction results found. Overwriting these results.')
+        logger.warning('Previous saccade extraction results found. Overwriting these results.')
         for prev_saccade in prev_saccades:
             os.remove(prev_saccade)
 
@@ -248,6 +260,7 @@ if __name__ == '__main__':
 
         sacc_group.create_dataset('labels', data=saccade_data['saccade_labels'][:])
         sacc_group.create_dataset('labels_coded', data=saccade_data['saccade_labels_coded'][:])
+        sacc_group.create_dataset('saccade_label_mapping', data=saccade_data['saccade_label_mapping'][:])
         sacc_group.create_dataset('onsets', data = saccade_data['saccade_onset'][:])
         sacc_group.create_dataset('offsets', data = saccade_data['saccade_offset'][:])
         sacc_group.create_dataset('waveforms', data= saccade_data['saccade_waveforms'][:])
@@ -267,4 +280,5 @@ if __name__ == '__main__':
     # Answers are given without subframe precision (values calculated from nearest frame index)
     outfile.close()
     saccade_data.close()
-    print('Saccade extraction completed. Results saved to results.h5.')
+    #print('Saccade extraction completed. Results saved to results.h5.')
+    logger.info('Saccade extraction completed. Results saved to {outfile}')

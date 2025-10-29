@@ -8,6 +8,9 @@ import matplotlib.pyplot as plt
 
 from glob import glob
 
+import logging
+logger = logging.getLogger(__name__)
+
 def parse_drifting_grating_metadata(file_path):
     # Read the file content
     with open(file_path, 'r') as f:
